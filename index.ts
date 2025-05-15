@@ -7,9 +7,10 @@
 
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { Client, estypes, ClientOptions } from "@elastic/elasticsearch";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import fs from "fs";
+import express from "express";
 
 // Configuration schema with auth options
 const ConfigSchema = z
@@ -72,7 +73,7 @@ type ElasticsearchConfig = z.infer<typeof ConfigSchema>;
 
 export async function createElasticsearchMcpServer(
   config: ElasticsearchConfig
-) {
+): Promise<McpServer> {
   const validatedConfig = ConfigSchema.parse(config);
   const { url, apiKey, username, password, caCert } = validatedConfig;
 
@@ -410,22 +411,21 @@ const config: ElasticsearchConfig = {
   caCert: process.env.ES_CA_CERT || "",
 };
 
-async function main() {
-  const transport = new StdioServerTransport();
-  const server = await createElasticsearchMcpServer(config);
+const app = express();
 
-  await server.connect(transport);
+const server = await createElasticsearchMcpServer(config);
 
-  process.on("SIGINT", async () => {
-    await server.close();
-    process.exit(0);
-  });
-}
+let transport: SSEServerTransport | null = null;
 
-main().catch((error) => {
-  console.error(
-    "Server error:",
-    error instanceof Error ? error.message : String(error)
-  );
-  process.exit(1);
+app.get("/sse", (req: express.Request, res: express.Response) => {
+  transport = new SSEServerTransport("/messages", res);
+  server.connect(transport);
 });
+
+app.post("/messages", (req: express.Request, res: express.Response) => {
+  if (transport) {
+    transport.handlePostMessage(req, res);
+  }
+});
+
+app.listen(process.env.MCP_SERVER_PORT || 3000);
