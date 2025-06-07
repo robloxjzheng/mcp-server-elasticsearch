@@ -1,0 +1,13 @@
+name: 'Build & Publish Package'
+
+on:
+  pull_request:
+    # Run on both opened and sync events to ensure paths always build.
+    types: [opened, synchronize]
+    branches: [ main, "spr/**" ]
+
+jobs:
+  build-and-publish:
+    uses: "Roblox/publish-npm-package/.github/workflows/build-and-publish.yml@v1"
+    secrets:
+      artifactory_bearer_token: ${{ secrets.ROBLOX_ARTIFACTORY_CI_PUBLISH_BEARER_TOKEN }}
