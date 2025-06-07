@@ -1,6 +1,6 @@
 {
-  "name": "@elastic/mcp-server-elasticsearch",
-  "description": "Elasticsearch MCP Server",
+  "name": "logs-mcp-server-poc",
+  "description": "Logs Elasticsearch MCP Server",
   "version": "0.1.1",
   "license": "Apache-2.0",
   "author": "Elastic",
@@ -10,9 +10,9 @@
   "bin": {
     "mcp-server-elasticsearch": "./dist/index.js"
   },
-  "repository": "https://github.com/elastic/mcp-server-elasticsearch",
-  "bugs": "https://github.com/elastic/mcp-server-elasticsearch/issues",
-  "homepage": "https://github.com/elastic/mcp-server-elasticsearch",
+  "repository": "https://github.com/robloxjzheng/mcp-server-elasticsearch",
+  "bugs": "https://github.com/robloxjzheng/mcp-server-elasticsearch/issues",
+  "homepage": "https://github.com/robloxjzheng/mcp-server-elasticsearch",
   "keywords": [
     "elasticsearch",
     "search",
@@ -52,6 +52,7 @@
     "typescript": "5.8.3"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://artifactory.rbx.com/api/npm/npm-rbx-local/"
   }
 }
