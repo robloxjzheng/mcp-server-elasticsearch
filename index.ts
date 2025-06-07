@@ -16,6 +16,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 // Parse command line arguments
 function parseArgs() {
   const args = process.argv.slice(2);
+  console.log(args);
   const parsed: Record<string, string> = {};
   
   for (let i = 0; i < args.length; i++) {
@@ -26,6 +27,8 @@ function parseArgs() {
       if (value && !value.startsWith('--')) {
         parsed[key] = value;
         i++; // Skip the value in the next iteration
+      } else {
+        parsed[key] = "true";
       }
     }
   }
@@ -690,6 +693,7 @@ const config: ElasticsearchConfig = {
   caCert: process.env.ES_CA_CERT || "",
 };
 
+console.log(cliArgs);
 if (cliArgs.remote) {
   const app = express();
 
@@ -708,8 +712,9 @@ if (cliArgs.remote) {
     }
   });
 
-  console.log("Starting MCP server on port", process.env.MCP_SERVER_PORT);
-  app.listen(process.env.MCP_SERVER_PORT || 3000);
+  const port = cliArgs.port || process.env.MCP_SERVER_PORT || 3000;
+  console.log("Starting MCP server on port", port);
+  app.listen(port);
 } else {
   const transport = new StdioServerTransport();
   const server = await createElasticsearchMcpServer(config);
